@@ -14,3 +14,6 @@ And currently there are three program files included:
 (2)The second file, "number_recognition_cnn.py" is the cnn that seems to overfit the data. This is where the major issue lies I believe, No combination of cnn seems to not produce an accuracy of over 90% within three epochs.
 
 (3)The "number_recognition_num_predict.py" file is to purely test against falsely created data to see if the cnn can accurately identify a 3 from a 4.
+
+This is the journal article I have found that might be able to help:
+https://www.nature.com/articles/s41598-017-18171-7
