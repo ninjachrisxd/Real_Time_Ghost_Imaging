@@ -22,19 +22,29 @@ num_classes = 1
 
 model = Sequential()
 
+#Reshaping done prior
+
+#Hidden layer 1
 model.add(Conv2D(16, (2, 2), input_shape=X.shape[1:]))
 model.add(Activation('relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
-#model.add(Conv2D(32, (20, 20)))
-#model.add(Activation('relu'))
-#model.add(MaxPooling2D(pool_size=(2, 2)))
+#Hidden layer 2
+model.add(Conv2D(16, (2, 2)))
+model.add(Activation('relu'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+
+#Hidden layer 3
+model.add(Conv2D(16, (2, 2)))
+model.add(Activation('relu'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
 
 model.add(Flatten())  # this converts our 3D feature maps to 1D feature vectors
 model.add(Dense(64))
 
 model.add(Dense(1))
-model.add(Activation('sigmoid'))
+model.add(Activation('relu'))
+
 
 #model.add(Conv2D(64, kernel_size=(20, 20),
 #                 activation='relu',
@@ -50,8 +60,8 @@ model.add(Activation('sigmoid'))
 
 tensorboard = TensorBoard(log_dir="logs/{}".format(NAME))
 
-model.compile(loss='binary_crossentropy',
-              optimizer='adam',
+model.compile(loss='mean_squared_error',
+              optimizer='sgd',
               metrics=['accuracy'],
               )
 
