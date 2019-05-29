@@ -1,61 +1,62 @@
-#Takes the data from the pickles (created in program "number_recognition_data_input") and puts it into the Neural Net to train
+# Part 1 - Building the CNN
 
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout, Activation, Flatten
-from tensorflow.keras.layers import Conv2D, MaxPooling2D
-from tensorflow.keras.callbacks import TensorBoard
-import numpy as np
-import tensorflow as tf
-import pickle
-import time
+# Importing the Keras libraries and packages
+from keras.models import Sequential
+from keras.layers import Conv2D
+from keras.layers import MaxPooling2D
+from keras.layers import Flatten
+from keras.layers import Dense
 
-NAME = "Test_CNN"
+# Initialising the CNN
+classifier = Sequential()
 
-pickle_in = open("X.pickle","rb")
-X = pickle.load(pickle_in)
+# Step 1 - Convolution
+classifier.add(Conv2D(32, (3, 3), input_shape = (64, 64, 3), activation = 'relu'))
 
-pickle_in = open("y.pickle","rb")
-y = pickle.load(pickle_in)
+# Step 2 - Pooling
+classifier.add(MaxPooling2D(pool_size = (2, 2)))
 
-X = X/255.0
-num_classes = 1
+# Adding a second convolutional layer
+classifier.add(Conv2D(32, (3, 3), activation = 'relu'))
+classifier.add(MaxPooling2D(pool_size = (2, 2)))
 
-model = Sequential()
+# Step 3 - Flattening
+classifier.add(Flatten())
 
-#Reshaping done prior
+# Step 4 - Full connection
+classifier.add(Dense(units = 128, activation = 'relu'))
+classifier.add(Dense(units = 128, activation = 'relu'))
+classifier.add(Dense(units = 128, activation = 'relu'))
+classifier.add(Dense(units = 1, activation = 'sigmoid'))
 
-#Hidden layer 1
-model.add(Conv2D(16, (2, 2), input_shape=X.shape[1:]))
-model.add(Activation('relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
+# Compiling the CNN
+classifier.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accuracy'])
 
-#Hidden layer 2
-model.add(Conv2D(16, (2, 2)))
-model.add(Activation('relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
+# Part 2 - Fitting the CNN to the images
 
-#Hidden layer 3
-model.add(Conv2D(16, (2, 2)))
-model.add(Activation('relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
+from keras.preprocessing.image import ImageDataGenerator
 
-model.add(Flatten())  # this converts our 3D feature maps to 1D feature vectors
-model.add(Dense(64))
+train_datagen = ImageDataGenerator(rescale = 1./255,
+                                   shear_range = 0.2,
+                                   zoom_range = 0.2,
+                                   horizontal_flip = True)
 
-model.add(Dense(1))
-model.add(Activation('relu'))
+test_datagen = ImageDataGenerator(rescale = 1./255)
 
-tensorboard = TensorBoard(log_dir="logs/{}".format(NAME))
+training_set = train_datagen.flow_from_directory('training_set',
+                                                 target_size = (64, 64),
+                                                 batch_size = 32,
+                                                 class_mode = 'binary')
 
-model.compile(loss='mean_squared_error',
-              optimizer='sgd',
-              metrics=['accuracy'],
-              )
+test_set = test_datagen.flow_from_directory('testing_set',
+                                            target_size = (64, 64),
+                                            batch_size = 32,
+                                            class_mode = 'binary')
 
-model.fit(X, y,
-          batch_size=32,
-          epochs=3,
-          validation_split=0.3,
-          callbacks=[tensorboard])
+classifier.fit_generator(training_set,
+                         steps_per_epoch = 10,
+                         epochs = 25,
+                         validation_data = test_set,
+                         validation_steps = 10)
 
-model.save('4_or_not.model')
+classifier.save('4cnn.h5')
