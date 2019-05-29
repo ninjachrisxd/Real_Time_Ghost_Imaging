@@ -45,19 +45,6 @@ model.add(Dense(64))
 model.add(Dense(1))
 model.add(Activation('relu'))
 
-
-#model.add(Conv2D(64, kernel_size=(20, 20),
-#                 activation='relu',
-#                 input_shape=X.shape[1:]))
-#model.add(MaxPooling2D(pool_size=(2, 2)))
-##model.add(Conv2D(32, (20, 20), activation='relu'))
-##model.add(MaxPooling2D(pool_size=(4, 4)))
-#model.add(Dropout(0.25))
-#model.add(Flatten())
-#model.add(Dense(64, activation='relu'))
-##model.add(Dropout(0.5))
-##model.add(Dense(num_classes, activation='sigmoid'))
-
 tensorboard = TensorBoard(log_dir="logs/{}".format(NAME))
 
 model.compile(loss='mean_squared_error',
